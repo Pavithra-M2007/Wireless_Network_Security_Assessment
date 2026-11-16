@@ -1,0 +1,97 @@
+# rules/dos_indicators.yaml
+# ---------------------------------------------------------------------------
+# Deauthentication / Disassociation Frame Count Heuristics
+#
+# !! IMPORTANT — HEURISTIC INDICATORS ONLY !!
+#
+# These rules fire based solely on observed frame counts in a passive
+# capture. A high count of deauthentication or disassociation frames
+# may indicate an active attack tool, but can equally result from:
+#   - Normal client roaming or AP failover
+#   - Access point reboots or firmware updates
+#   - Client driver bugs or aggressive power-management
+#   - Nearby APs on overlapping channels
+#
+# Findings produced by these rules are stated as observations ("N frames
+# were observed"), never as proof of an attack, and no attacker identity
+# or intent is attributed.
+#
+# Attribution note (broadcast floods):
+#   A spoofed deauthentication broadcast has addr1=ff:ff:ff:ff:ff:ff and
+#   a randomised source address. Stage 2 conservatively attributes such
+#   frames to every AP whose BSSID appeared in the capture — which means
+#   multiple APs in the same file may all show the same elevated count.
+#   This is a deliberate design choice that avoids false negatives; the
+#   count alone does not identify which AP was targeted.
+#
+# FIELD REFERENCE (NetworkFeatures):
+#   deauth_count  int — total deauth + disassoc frames attributed to BSSID
+#
+# Threshold rationale (documented heuristics):
+#   FLOOD_THRESHOLD    = 10   — consistent with count produced by automated tools
+#   ELEVATED_THRESHOLD = 3    — above typical incidental / roaming counts
+# ---------------------------------------------------------------------------
+
+rules:
+
+  - id: DOS-001
+    category: Denial-of-Service Indicators
+    severity: HIGH
+    title: "High Deauthentication Frame Count (Heuristic)"
+    evidence_field: deauth_count
+    condition:
+      op: gte
+      field: deauth_count
+      value: 10
+    explanation: >-
+      Ten or more deauthentication or disassociation frames were associated
+      with this BSSID during the capture period. This count meets the
+      threshold commonly produced by automated deauthentication tools.
+      This is a heuristic observation based on frame counts only — it does
+      not prove that an attack occurred and does not identify an attacker
+      or their intent.
+    impact: >-
+      If these frames originate from a forged source, affected clients
+      may experience repeated disconnection events (denial of service).
+      Forced reconnections can also create opportunities to capture
+      WPA2 4-way handshake frames for offline analysis. Without Management
+      Frame Protection there is no way to verify whether these frames
+      are authentic or spoofed.
+    remediation: >-
+      Enable Management Frame Protection (IEEE 802.11w) to make
+      deauthentication frames cryptographically authenticated and
+      resistant to forgery. Deploy a Wireless Intrusion Prevention System
+      (WIPS) for real-time detection of elevated deauthentication rates.
+      Upgrade to WPA3-Personal, which mandates MFP for all clients.
+
+  - id: DOS-002
+    category: Denial-of-Service Indicators
+    severity: MEDIUM
+    title: "Elevated Deauthentication Frame Count (Heuristic)"
+    evidence_field: deauth_count
+    condition:
+      op: all_of
+      conditions:
+        - op: gte
+          field: deauth_count
+          value: 3
+        - op: lt
+          field: deauth_count
+          value: 10
+    explanation: >-
+      Between 3 and 9 deauthentication or disassociation frames were
+      associated with this BSSID during the capture period. This is above
+      incidental levels and may indicate a failed or intermittent event,
+      client roaming activity, or AP instability. This is a heuristic
+      observation; it does not prove that an attack occurred.
+    impact: >-
+      Moderate deauthentication activity may indicate reconnaissance or
+      an interrupted event. Monitor for escalation to higher counts.
+      Without Management Frame Protection the source of these frames
+      cannot be verified as authentic.
+    remediation: >-
+      Enable Management Frame Protection to authenticate management frames
+      regardless of volume. Review AP and client logs for corroborating
+      connectivity events. Establish a per-environment baseline for
+      deauthentication counts and configure alerting thresholds based
+      on that baseline.

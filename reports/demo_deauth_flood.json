@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "source_file": "data/simulated/deauth_flood.pcapng",
+  "source_filename": "deauth_flood.pcapng",
+  "data_source": "simulated",
+  "data_source_note": "Generated from synthetic test data produced by the WSA PCAP generator. Findings describe characteristics of artificial captures and do not reflect any real wireless environment.",
+  "analysis_timestamp": "2026-10-06T13:49:07.803510+00:00",
+  "summary": {
+    "total_frames": 33,
+    "total_networks": 1,
+    "total_probe_requests": 3,
+    "total_deauth_frames": 20,
+    "total_eapol_frames": 0,
+    "total_findings": 2,
+    "total_risk_score": 20,
+    "severity_counts": {
+      "CRITICAL": 0,
+      "HIGH": 1,
+      "MEDIUM": 1,
+      "LOW": 0,
+      "INFO": 0
+    }
+  },
+  "parse_errors": [],
+  "networks": [
+    {
+      "bssid": "02:aa:bb:dd:ee:ff",
+      "ssid": "TargetNetwork",
+      "channel": 6,
+      "avg_rssi_dbm": null,
+      "cipher": "CCMP",
+      "group_cipher": "CCMP",
+      "pairwise_ciphers": [
+        "CCMP"
+      ],
+      "privacy_bit": true,
+      "auth_type": "PSK",
+      "akm_suites": [
+        "PSK"
+      ],
+      "wpa_versions": [
+        "WPA2"
+      ],
+      "mfp_capable": false,
+      "mfp_required": false,
+      "wps_present": false,
+      "beacon_count": 10,
+      "deauth_count": 20,
+      "eapol_frame_count": 0,
+      "hidden_ssid": false,
+      "parser_notes": [],
+      "risk_score": 20,
+      "highest_severity": "HIGH",
+      "severity_counts": {
+        "CRITICAL": 0,
+        "HIGH": 1,
+        "MEDIUM": 1,
+        "LOW": 0,
+        "INFO": 0
+      },
+      "findings": [
+        {
+          "rule_id": "AUTH-002",
+          "category": "Management Frame Protection",
+          "severity": "MEDIUM",
+          "title": "Management Frame Protection Not Advertised (IEEE 802.11w)",
+          "explanation": "An RSN Information Element was observed but the RSN Capabilities field shows neither MFPC (Management Frame Protection Capable) nor MFPR (Required). All 802.11 management frames — including deauthentication and disassociation — are unauthenticated.",
+          "impact": "Deauthentication and disassociation frames can be forged trivially using a spoofed BSSID. An attacker may disconnect clients (denial of service), force reconnections to capture 4-way handshakes for offline analysis, or create conditions that assist an evil-twin attack — without breaking any encryption.",
+          "remediation": "Enable Management Frame Protection. For WPA2 networks, set MFP to Optional (MFPC=1, MFPR=0) initially to maintain backward compatibility with legacy clients, then set Required (MFPR=1) once all clients support IEEE 802.11w. Upgrading to WPA3 mandates MFP for all clients.",
+          "evidence": "mfp_capable = False",
+          "bssid": "02:aa:bb:dd:ee:ff",
+          "ssid": "TargetNetwork"
+        },
+        {
+          "rule_id": "DOS-001",
+          "category": "Denial-of-Service Indicators",
+          "severity": "HIGH",
+          "title": "High Deauthentication Frame Count (Heuristic)",
+          "explanation": "Ten or more deauthentication or disassociation frames were associated with this BSSID during the capture period. This count meets the threshold commonly produced by automated deauthentication tools. This is a heuristic observation based on frame counts only — it does not prove that an attack occurred and does not identify an attacker or their intent.",
+          "impact": "If these frames originate from a forged source, affected clients may experience repeated disconnection events (denial of service). Forced reconnections can also create opportunities to capture WPA2 4-way handshake frames for offline analysis. Without Management Frame Protection there is no way to verify whether these frames are authentic or spoofed.",
+          "remediation": "Enable Management Frame Protection (IEEE 802.11w) to make deauthentication frames cryptographically authenticated and resistant to forgery. Deploy a Wireless Intrusion Prevention System (WIPS) for real-time detection of elevated deauthentication rates. Upgrade to WPA3-Personal, which mandates MFP for all clients.",
+          "evidence": "deauth_count = 20",
+          "bssid": "02:aa:bb:dd:ee:ff",
+          "ssid": "TargetNetwork"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "source_file": "data/simulated/wpa3_network.pcapng",
+  "source_filename": "wpa3_network.pcapng",
+  "data_source": "simulated",
+  "data_source_note": "Generated from synthetic test data produced by the WSA PCAP generator. Findings describe characteristics of artificial captures and do not reflect any real wireless environment.",
+  "analysis_timestamp": "2026-10-06T13:49:06.412510+00:00",
+  "summary": {
+    "total_frames": 13,
+    "total_networks": 1,
+    "total_probe_requests": 3,
+    "total_deauth_frames": 0,
+    "total_eapol_frames": 0,
+    "total_findings": 0,
+    "total_risk_score": 0,
+    "severity_counts": {
+      "CRITICAL": 0,
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 0,
+      "INFO": 0
+    }
+  },
+  "parse_errors": [],
+  "networks": [
+    {
+      "bssid": "02:aa:bb:aa:bb:cc",
+      "ssid": "SecureNet5G",
+      "channel": 36,
+      "avg_rssi_dbm": null,
+      "cipher": "CCMP",
+      "group_cipher": "CCMP",
+      "pairwise_ciphers": [
+        "CCMP"
+      ],
+      "privacy_bit": true,
+      "auth_type": "SAE",
+      "akm_suites": [
+        "SAE"
+      ],
+      "wpa_versions": [
+        "WPA2",
+        "WPA3"
+      ],
+      "mfp_capable": true,
+      "mfp_required": true,
+      "wps_present": false,
+      "beacon_count": 10,
+      "deauth_count": 0,
+      "eapol_frame_count": 0,
+      "hidden_ssid": false,
+      "parser_notes": [],
+      "risk_score": 0,
+      "highest_severity": null,
+      "severity_counts": {
+        "CRITICAL": 0,
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "INFO": 0
+      },
+      "findings": []
+    }
+  ]
+}

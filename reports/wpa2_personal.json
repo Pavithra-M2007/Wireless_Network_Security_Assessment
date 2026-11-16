@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "source_file": "data/simulated/wpa2_personal.pcapng",
+  "source_filename": "wpa2_personal.pcapng",
+  "data_source": "simulated",
+  "data_source_note": "Generated from synthetic test data produced by the WSA PCAP generator. Findings describe characteristics of artificial captures and do not reflect any real wireless environment.",
+  "analysis_timestamp": "2026-10-05T14:00:00+00:00",
+  "summary": {
+    "total_frames": 19,
+    "total_networks": 1,
+    "total_probe_requests": 5,
+    "total_deauth_frames": 0,
+    "total_eapol_frames": 4,
+    "total_findings": 2,
+    "total_risk_score": 17,
+    "severity_counts": {
+      "CRITICAL": 0,
+      "HIGH": 1,
+      "MEDIUM": 0,
+      "LOW": 1,
+      "INFO": 0
+    }
+  },
+  "parse_errors": [],
+  "networks": [
+    {
+      "bssid": "02:aa:bb:77:88:99",
+      "ssid": "HomeNetwork",
+      "channel": 1,
+      "avg_rssi_dbm": null,
+      "cipher": "CCMP",
+      "group_cipher": "CCMP",
+      "pairwise_ciphers": [
+        "CCMP"
+      ],
+      "privacy_bit": true,
+      "auth_type": "PSK",
+      "akm_suites": [
+        "PSK"
+      ],
+      "wpa_versions": [
+        "WPA2"
+      ],
+      "mfp_capable": true,
+      "mfp_required": false,
+      "wps_present": true,
+      "beacon_count": 10,
+      "deauth_count": 0,
+      "eapol_frame_count": 4,
+      "hidden_ssid": false,
+      "parser_notes": [],
+      "risk_score": 17,
+      "highest_severity": "HIGH",
+      "severity_counts": {
+        "CRITICAL": 0,
+        "HIGH": 1,
+        "MEDIUM": 0,
+        "LOW": 1,
+        "INFO": 0
+      },
+      "findings": [
+        {
+          "rule_id": "AUTH-001",
+          "category": "Authentication",
+          "severity": "HIGH",
+          "title": "Wi-Fi Protected Setup (WPS) Advertised",
+          "explanation": "A WPS vendor-specific Information Element (OUI 00:50:F2, type 04) was observed in beacons from this AP, indicating that Wi-Fi Protected Setup is advertised as available to connecting clients.",
+          "impact": "WPS PIN mode is vulnerable to the Pixie Dust attack (offline brute-force of the enrollee nonce, often completing in under a minute) and to online brute-force tools. An attacker may recover the WPS PIN and through it the WPA2 passphrase without capturing any client traffic. Push-Button Configuration (PBC) avoids the PIN attack surface but exposes a two-minute open-enrollment window during which any nearby device can associate.",
+          "remediation": "Disable WPS entirely in the AP administration interface. Modern devices support direct passphrase entry and QR-code pairing without WPS. If WPS cannot be disabled, verify that the firmware has patched CVE-2011-5053 (Pixie Dust) and enforce rate-limiting on PIN attempts.",
+          "evidence": "wps_present = True",
+          "bssid": "02:aa:bb:77:88:99",
+          "ssid": "HomeNetwork"
+        },
+        {
+          "rule_id": "AUTH-003",
+          "category": "Management Frame Protection",
+          "severity": "LOW",
+          "title": "Management Frame Protection Optional, Not Required",
+          "explanation": "The RSN Capabilities field shows MFPC=1 (capable) but MFPR=0 (not required). The AP accepts associations both with and without Management Frame Protection. Clients that do not negotiate MFP receive no protection for management frames.",
+          "impact": "Non-MFP clients on this network remain vulnerable to spoofed deauthentication and disassociation frames even while MFP-capable clients are protected. An attacker can selectively target legacy clients without affecting others.",
+          "remediation": "Set MFP to Required (MFPR=1) once all client devices support IEEE 802.11w. Legacy devices that do not support MFP should be retired or isolated to a separate VLAN or SSID. Upgrading to WPA3-Personal makes MFP mandatory for all clients.",
+          "evidence": "mfp_required = False",
+          "bssid": "02:aa:bb:77:88:99",
+          "ssid": "HomeNetwork"
+        }
+      ]
+    }
+  ]
+}

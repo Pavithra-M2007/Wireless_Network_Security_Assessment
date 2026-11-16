@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WSA Report &#8212; open_network.pcapng</title>
+  <style>*,::before,::after{box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  margin:0;padding:0;background:#f5f3ff;color:#1e1b4b;line-height:1.6;font-size:15px}
+a{color:#6d28d9}
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.wsa-header{background:linear-gradient(135deg,#4c1d95 0%,#6d28d9 55%,#be185d 100%);
+  color:#fff;padding:2rem 1.5rem}
+.wsa-header h1{margin:0 0 .375rem;font-size:1.65rem;font-weight:700;color:#fff;letter-spacing:-.02em}
+.wsa-header p{margin:0;opacity:.82;font-size:.875rem;font-family:monospace}
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+.wsa-container{max-width:1060px;margin:0 auto;padding:1.5rem}
+section{margin-bottom:2rem}
+h2{color:#4c1d95;border-bottom:2px solid #ede9fe;padding-bottom:.35rem;margin-top:1.75rem;font-size:1.25rem}
+h3{color:#4c1d95;font-size:1.05rem;margin-top:1.5rem}
+h4{color:#6d28d9;font-size:.975rem;margin-top:1.25rem}
+/* ── Provenance banner ───────────────────────────────────────────────────── */
+.wsa-prov{border-radius:8px;padding:.8rem 1rem;margin:1.25rem 0;font-size:.9rem;line-height:1.5}
+.wsa-prov-simulated{background:#ede9fe;border:1px solid #7c3aed;color:#3730a3}
+.wsa-prov-real{background:#dcfce7;border:1px solid #16a34a;color:#14532d}
+.wsa-prov-unknown{background:#fef3c7;border:1px solid #d97706;color:#78350f}
+/* ── Summary cards ───────────────────────────────────────────────────────── */
+.wsa-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.875rem;margin:1rem 0}
+.wsa-card{background:#fff;border-radius:10px;padding:1.125rem .75rem;text-align:center;
+  box-shadow:0 1px 4px rgba(76,29,149,.13)}
+.wsa-card-val{font-size:1.9rem;font-weight:700;color:#6d28d9;line-height:1.1}
+.wsa-card-lbl{color:#64748b;font-size:.775rem;margin-top:.3rem;text-transform:uppercase;letter-spacing:.05em}
+/* ── Tables ──────────────────────────────────────────────────────────────── */
+.wsa-table{width:100%;border-collapse:collapse;margin:.875rem 0;background:#fff;
+  border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(76,29,149,.09)}
+.wsa-table th{background:#4c1d95;color:#fff;padding:.6rem .875rem;text-align:left;font-size:.825rem;font-weight:600}
+.wsa-table td{padding:.475rem .875rem;border-bottom:1px solid #ede9fe;font-size:.875rem;vertical-align:top}
+.wsa-table tr:last-child td{border-bottom:none}
+.wsa-table tbody tr:nth-child(even) td{background:#f8f6ff}
+/* ── Severity badges ─────────────────────────────────────────────────────── */
+.wsa-badge{display:inline-block;padding:.15rem .6rem;border-radius:4px;
+  font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.wsa-sev-CRITICAL{background:#fee2e2;color:#991b1b}
+.wsa-sev-HIGH    {background:#ffedd5;color:#9a3412}
+.wsa-sev-MEDIUM  {background:#fef9c3;color:#713f12}
+.wsa-sev-LOW     {background:#dcfce7;color:#14532d}
+.wsa-sev-INFO    {background:#dbeafe;color:#1e3a8a}
+/* ── Network cards ───────────────────────────────────────────────────────── */
+.wsa-net{background:#fff;border-radius:10px;padding:1.375rem 1.25rem;margin:1.25rem 0;
+  box-shadow:0 2px 6px rgba(76,29,149,.1)}
+.wsa-net h3{margin-top:0}
+.wsa-bssid{font-family:monospace;font-size:.8rem;color:#7c3aed;margin-left:.5rem;opacity:.85}
+.wsa-risk{font-size:.875rem;color:#475569;margin:.75rem 0}
+/* ── Finding cards ───────────────────────────────────────────────────────── */
+.wsa-finding{border-radius:8px;padding:1rem 1.125rem;margin:.75rem 0;border-left:4px solid}
+.wsa-f-CRITICAL{border-color:#dc2626;background:#fff7f7}
+.wsa-f-HIGH    {border-color:#ea580c;background:#fff9f5}
+.wsa-f-MEDIUM  {border-color:#d97706;background:#fffef0}
+.wsa-f-LOW     {border-color:#16a34a;background:#f0fdf4}
+.wsa-f-INFO    {border-color:#2563eb;background:#f0f6ff}
+.wsa-f-hdr{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.625rem}
+.wsa-f-id{font-size:.725rem;color:#94a3b8;font-family:monospace;margin-right:.125rem}
+.wsa-f-ev{margin:.5rem 0;font-size:.85rem}
+.wsa-f-ev code{background:#f1f5f9;padding:.175rem .5rem;border-radius:4px;font-family:monospace;font-size:.8rem;word-break:break-all}
+.wsa-f-sec{margin:.475rem 0;font-size:.875rem}
+.wsa-f-sec strong{color:#4c1d95}
+/* ── Special states ──────────────────────────────────────────────────────── */
+.wsa-clean{background:#dcfce7;border:1px solid #86efac;border-radius:8px;
+  padding:.8rem 1rem;color:#14532d;font-size:.875rem}
+.wsa-empty{color:#94a3b8;font-style:italic;font-size:.9rem}
+.wsa-notes{font-size:.825rem;color:#64748b;margin:.75rem 0}
+.wsa-notes summary{cursor:pointer;color:#7c3aed;font-weight:500}
+.wsa-notes ul{margin:.5rem 0;padding-left:1.25rem}
+.wsa-err-list{background:#fff7f7;border:1px solid #fca5a5;border-radius:8px;
+  padding:.875rem 1rem;font-size:.875rem;color:#7f1d1d}
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.wsa-footer{text-align:center;color:#a78bfa;font-size:.725rem;padding:2rem;
+  border-top:1px solid #ede9fe;margin-top:2rem}
+</style>
+</head>
+<body>
+
+<header class="wsa-header">
+  <div class="wsa-container">
+    <h1>Wireless Network Security Assessment</h1>
+    <p>open_network.pcapng &nbsp;&middot;&nbsp; 2026-10-06T13:48:11.700442+00:00</p>
+  </div>
+</header>
+
+<div class="wsa-container">
+
+  
+  <div class="wsa-prov wsa-prov-simulated">
+    <strong>Data source: SIMULATED</strong>
+    &mdash; Generated from synthetic test data produced by the WSA PCAP generator. Findings describe characteristics of artificial captures and do not reflect any real wireless environment.
+  </div>
+
+  
+  <section>
+    <h2>Executive Summary</h2>
+
+    <div class="wsa-cards">
+      <div class="wsa-card">
+        <div class="wsa-card-val">15</div>
+        <div class="wsa-card-lbl">Frames Analysed</div>
+      </div>
+      <div class="wsa-card">
+        <div class="wsa-card-val">1</div>
+        <div class="wsa-card-lbl">Networks</div>
+      </div>
+      <div class="wsa-card">
+        <div class="wsa-card-val">1</div>
+        <div class="wsa-card-lbl">Findings</div>
+      </div>
+      <div class="wsa-card">
+        <div class="wsa-card-val">40</div>
+        <div class="wsa-card-lbl">Risk Score</div>
+      </div>
+      <div class="wsa-card">
+        <div class="wsa-card-val">0</div>
+        <div class="wsa-card-lbl">Deauth Frames</div>
+      </div>
+      <div class="wsa-card">
+        <div class="wsa-card-val">0</div>
+        <div class="wsa-card-lbl">EAPOL Frames</div>
+      </div>
+    </div>
+
+    <h3>Findings by Severity</h3>
+    <table class="wsa-table" role="table" aria-label="Findings by severity">
+      <thead><tr><th>Severity</th><th>Count</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td><span class="wsa-badge wsa-sev-CRITICAL">CRITICAL</span></td>
+          <td>1</td>
+        </tr>
+        
+        <tr>
+          <td><span class="wsa-badge wsa-sev-HIGH">HIGH</span></td>
+          <td>0</td>
+        </tr>
+        
+        <tr>
+          <td><span class="wsa-badge wsa-sev-MEDIUM">MEDIUM</span></td>
+          <td>0</td>
+        </tr>
+        
+        <tr>
+          <td><span class="wsa-badge wsa-sev-LOW">LOW</span></td>
+          <td>0</td>
+        </tr>
+        
+        <tr>
+          <td><span class="wsa-badge wsa-sev-INFO">INFO</span></td>
+          <td>0</td>
+        </tr>
+        
+      </tbody>
+    </table>
+  </section>
+
+  
+  <section>
+    <h2>Networks (1)</h2>
+
+    
+
+    
+    <div class="wsa-net">
+      <h3>
+        OpenCafe
+        <span class="wsa-bssid">02:aa:bb:11:22:33</span>
+      </h3>
+
+      <table class="wsa-table" role="table" aria-label="Network properties">
+        <tbody>
+          <tr><td><strong>Channel</strong></td>
+              <td>6</td></tr>
+          <tr><td><strong>Cipher</strong></td><td>NONE</td></tr>
+          <tr><td><strong>Auth type</strong></td><td>OPEN</td></tr>
+          <tr><td><strong>WPA versions</strong></td>
+              <td>—</td></tr>
+          <tr><td><strong>Pairwise ciphers</strong></td>
+              <td>—</td></tr>
+          <tr><td><strong>Group cipher</strong></td>
+              <td>— (RSN IE absent)</td></tr>
+          <tr><td><strong>MFP capable</strong></td>
+              <td>— (RSN IE absent)
+                  </td></tr>
+          <tr><td><strong>MFP required</strong></td>
+              <td>— (RSN IE absent)
+                  </td></tr>
+          <tr><td><strong>WPS advertised</strong></td>
+              <td>No</td></tr>
+          <tr><td><strong>Average RSSI</strong></td>
+              <td>— (not recorded)
+                  </td></tr>
+          <tr><td><strong>Beacon count</strong></td><td>10</td></tr>
+          <tr><td><strong>Deauth count</strong></td><td>0</td></tr>
+          <tr><td><strong>EAPOL frames</strong></td><td>0</td></tr>
+        </tbody>
+      </table>
+
+      <div class="wsa-risk">
+        Risk score: <strong>40</strong>
+        
+          &nbsp;&middot;&nbsp; Highest:
+          <span class="wsa-badge wsa-sev-CRITICAL">CRITICAL</span>
+        
+      </div>
+
+      
+      <h4>Security Findings (1)</h4>
+
+      
+        
+        <div class="wsa-finding wsa-f-CRITICAL">
+          <div class="wsa-f-hdr">
+            <span class="wsa-badge wsa-sev-CRITICAL">CRITICAL</span>
+            <span class="wsa-f-id">ENC-001</span>
+            <strong>Open Network — No Encryption</strong>
+          </div>
+          <div class="wsa-f-ev">
+            <strong>Evidence:</strong> <code>cipher = &#39;NONE&#39;</code>
+          </div>
+          <div class="wsa-f-sec">
+            <strong>Explanation:</strong> No RSN Information Element and no Privacy capability bit were observed in any beacon from this AP. All frames are transmitted in plaintext and client associations are unauthenticated.
+          </div>
+          <div class="wsa-f-sec">
+            <strong>Impact:</strong> Any passive observer on the same RF channel can capture all traffic including credentials, session tokens, and sensitive data without specialised hardware or an active attack.
+          </div>
+          <div class="wsa-f-sec">
+            <strong>Remediation:</strong> Enable WPA3-Personal (SAE) or at minimum WPA2-Personal (AES/CCMP). For shared-access networks consider OWE (Opportunistic Wireless Encryption, AKM 18) which provides per-session encryption without a shared passphrase.
+          </div>
+        </div>
+        
+      
+
+      
+      
+
+    </div>
+    
+  </section>
+
+  
+  
+
+</div>
+
+<footer class="wsa-footer">
+  Generated by Wireless Network Security Assessment (WSA)
+  &nbsp;&middot;&nbsp; 2026-10-06T13:48:11.700442+00:00
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,112 @@
+# rules/encryption.yaml
+# ---------------------------------------------------------------------------
+# Encryption Security Rules
+#
+# Evaluated against wsa.analysis.feature_set.NetworkFeatures.
+#
+# FIELD REFERENCE (all from NetworkFeatures):
+#   cipher          str   — NONE | WEP | TKIP | CCMP | GCMP | MIXED | UNKNOWN
+#   privacy_bit     bool  — True when Privacy capability bit is set in beacon
+#   pairwise_ciphers list — labels from RSN pairwise cipher suite list
+#   group_cipher    str?  — None if no RSN IE was observed
+#
+# Absent-evidence policy:
+#   cipher == UNKNOWN means an RSN IE was present but the pairwise cipher
+#   selector was not in the known map.  No finding is raised in that case
+#   because the actual cipher strength cannot be determined from the
+#   available evidence.  Absence of evidence is not evidence of absence.
+# ---------------------------------------------------------------------------
+
+rules:
+
+  - id: ENC-001
+    category: Encryption
+    severity: CRITICAL
+    title: "Open Network — No Encryption"
+    evidence_field: cipher
+    condition:
+      op: eq
+      field: cipher
+      value: "NONE"
+    explanation: >-
+      No RSN Information Element and no Privacy capability bit were
+      observed in any beacon from this AP. All frames are transmitted
+      in plaintext and client associations are unauthenticated.
+    impact: >-
+      Any passive observer on the same RF channel can capture all traffic
+      including credentials, session tokens, and sensitive data without
+      specialised hardware or an active attack.
+    remediation: >-
+      Enable WPA3-Personal (SAE) or at minimum WPA2-Personal (AES/CCMP).
+      For shared-access networks consider OWE (Opportunistic Wireless
+      Encryption, AKM 18) which provides per-session encryption without
+      a shared passphrase.
+
+  - id: ENC-002
+    category: Encryption
+    severity: CRITICAL
+    title: "WEP Encryption Detected"
+    evidence_field: cipher
+    condition:
+      op: eq
+      field: cipher
+      value: "WEP"
+    explanation: >-
+      The AP sets the Privacy capability bit in its beacons but advertises
+      no RSN Information Element. This combination indicates WEP (Wired
+      Equivalent Privacy), deprecated since IEEE 802.11i-2004 and
+      cryptographically broken.
+    impact: >-
+      WEP keys can be recovered in under 60 seconds with freely available
+      tools given approximately 5 000 captured initialisation vectors.
+      All WEP-protected traffic is effectively transmitted in plaintext.
+    remediation: >-
+      Replace WEP immediately with WPA3-Personal (preferred) or
+      WPA2-Personal (AES/CCMP). There is no configuration or firmware
+      change that can make WEP cryptographically secure; hardware that
+      does not support WPA2 must be retired or replaced.
+
+  - id: ENC-003
+    category: Encryption
+    severity: HIGH
+    title: "TKIP-Only Cipher Suite"
+    evidence_field: cipher
+    condition:
+      op: eq
+      field: cipher
+      value: "TKIP"
+    explanation: >-
+      The RSN Information Element advertises TKIP as the sole pairwise
+      cipher suite. TKIP was designed as a short-term stopgap for legacy
+      WEP hardware and inherits several of its structural weaknesses.
+      IEEE 802.11-2012 deprecated TKIP as a pairwise cipher.
+    impact: >-
+      TKIP is susceptible to the Beck-Tews attack and related techniques,
+      which enable limited packet injection and forgery. Maximum link speed
+      is capped at 54 Mbps; 802.11n/ac high-throughput modes are unavailable.
+    remediation: >-
+      Reconfigure the AP to offer AES/CCMP only as the pairwise cipher.
+      Most access points and client adapters manufactured after 2008
+      support CCMP without a firmware update.
+
+  - id: ENC-004
+    category: Encryption
+    severity: MEDIUM
+    title: "Mixed TKIP/CCMP Cipher Mode"
+    evidence_field: cipher
+    condition:
+      op: eq
+      field: cipher
+      value: "MIXED"
+    explanation: >-
+      The RSN Information Element advertises both TKIP and CCMP as pairwise
+      cipher suites, allowing legacy TKIP-only clients to associate.
+      Overall security degrades to the weakest cipher in use on the network.
+    impact: >-
+      TKIP clients are exposed to TKIP-specific attacks. Mixed mode also
+      prevents the use of 802.11n/ac high-throughput rates for TKIP clients
+      and may reduce overall network capacity.
+    remediation: >-
+      Retire TKIP-only client devices and configure the AP to advertise
+      CCMP only. Hardware manufactured after 2010 generally supports
+      CCMP without modification.

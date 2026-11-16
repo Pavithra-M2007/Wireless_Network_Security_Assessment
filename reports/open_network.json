@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "source_file": "data/simulated/open_network.pcapng",
+  "source_filename": "open_network.pcapng",
+  "data_source": "simulated",
+  "data_source_note": "Generated from synthetic test data produced by the WSA PCAP generator. Findings describe characteristics of artificial captures and do not reflect any real wireless environment.",
+  "analysis_timestamp": "2026-10-05T14:00:00+00:00",
+  "summary": {
+    "total_frames": 15,
+    "total_networks": 1,
+    "total_probe_requests": 5,
+    "total_deauth_frames": 0,
+    "total_eapol_frames": 0,
+    "total_findings": 1,
+    "total_risk_score": 40,
+    "severity_counts": {
+      "CRITICAL": 1,
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 0,
+      "INFO": 0
+    }
+  },
+  "parse_errors": [],
+  "networks": [
+    {
+      "bssid": "02:aa:bb:11:22:33",
+      "ssid": "OpenCafe",
+      "channel": 6,
+      "avg_rssi_dbm": null,
+      "cipher": "NONE",
+      "group_cipher": null,
+      "pairwise_ciphers": [],
+      "privacy_bit": false,
+      "auth_type": "OPEN",
+      "akm_suites": [],
+      "wpa_versions": [],
+      "mfp_capable": null,
+      "mfp_required": null,
+      "wps_present": false,
+      "beacon_count": 10,
+      "deauth_count": 0,
+      "eapol_frame_count": 0,
+      "hidden_ssid": false,
+      "parser_notes": [],
+      "risk_score": 40,
+      "highest_severity": "CRITICAL",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "INFO": 0
+      },
+      "findings": [
+        {
+          "rule_id": "ENC-001",
+          "category": "Encryption",
+          "severity": "CRITICAL",
+          "title": "Open Network — No Encryption",
+          "explanation": "No RSN Information Element and no Privacy capability bit were observed in any beacon from this AP. All frames are transmitted in plaintext and client associations are unauthenticated.",
+          "impact": "Any passive observer on the same RF channel can capture all traffic including credentials, session tokens, and sensitive data without specialised hardware or an active attack.",
+          "remediation": "Enable WPA3-Personal (SAE) or at minimum WPA2-Personal (AES/CCMP). For shared-access networks consider OWE (Opportunistic Wireless Encryption, AKM 18) which provides per-session encryption without a shared passphrase.",
+          "evidence": "cipher = 'NONE'",
+          "bssid": "02:aa:bb:11:22:33",
+          "ssid": "OpenCafe"
+        }
+      ]
+    }
+  ]
+}

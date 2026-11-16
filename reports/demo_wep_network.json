@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "source_file": "data/simulated/wep_network.pcapng",
+  "source_filename": "wep_network.pcapng",
+  "data_source": "simulated",
+  "data_source_note": "Generated from synthetic test data produced by the WSA PCAP generator. Findings describe characteristics of artificial captures and do not reflect any real wireless environment.",
+  "analysis_timestamp": "2026-10-06T13:49:03.077074+00:00",
+  "summary": {
+    "total_frames": 15,
+    "total_networks": 1,
+    "total_probe_requests": 5,
+    "total_deauth_frames": 0,
+    "total_eapol_frames": 0,
+    "total_findings": 1,
+    "total_risk_score": 40,
+    "severity_counts": {
+      "CRITICAL": 1,
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 0,
+      "INFO": 0
+    }
+  },
+  "parse_errors": [],
+  "networks": [
+    {
+      "bssid": "02:aa:bb:44:55:66",
+      "ssid": "LegacyCorpNet",
+      "channel": 11,
+      "avg_rssi_dbm": null,
+      "cipher": "WEP",
+      "group_cipher": null,
+      "pairwise_ciphers": [],
+      "privacy_bit": true,
+      "auth_type": "OPEN",
+      "akm_suites": [],
+      "wpa_versions": [],
+      "mfp_capable": null,
+      "mfp_required": null,
+      "wps_present": false,
+      "beacon_count": 10,
+      "deauth_count": 0,
+      "eapol_frame_count": 0,
+      "hidden_ssid": false,
+      "parser_notes": [],
+      "risk_score": 40,
+      "highest_severity": "CRITICAL",
+      "severity_counts": {
+        "CRITICAL": 1,
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "INFO": 0
+      },
+      "findings": [
+        {
+          "rule_id": "ENC-002",
+          "category": "Encryption",
+          "severity": "CRITICAL",
+          "title": "WEP Encryption Detected",
+          "explanation": "The AP sets the Privacy capability bit in its beacons but advertises no RSN Information Element. This combination indicates WEP (Wired Equivalent Privacy), deprecated since IEEE 802.11i-2004 and cryptographically broken.",
+          "impact": "WEP keys can be recovered in under 60 seconds with freely available tools given approximately 5 000 captured initialisation vectors. All WEP-protected traffic is effectively transmitted in plaintext.",
+          "remediation": "Replace WEP immediately with WPA3-Personal (preferred) or WPA2-Personal (AES/CCMP). There is no configuration or firmware change that can make WEP cryptographically secure; hardware that does not support WPA2 must be retired or replaced.",
+          "evidence": "cipher = 'WEP'",
+          "bssid": "02:aa:bb:44:55:66",
+          "ssid": "LegacyCorpNet"
+        }
+      ]
+    }
+  ]
+}

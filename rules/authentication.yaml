@@ -1,0 +1,107 @@
+# rules/authentication.yaml
+# ---------------------------------------------------------------------------
+# Authentication and Management Frame Protection Rules
+#
+# Evaluated against wsa.analysis.feature_set.NetworkFeatures.
+#
+# FIELD REFERENCE (all from NetworkFeatures):
+#   wps_present   bool          — True if WPS IE (OUI 00:50:F2:04) observed
+#   mfp_capable   Optional[bool]— None when no RSN IE was observed
+#   mfp_required  Optional[bool]— None when no RSN IE was observed
+#   auth_type     str           — OPEN | PSK | SAE | EAP | OWE | UNKNOWN
+#
+# Absent-evidence policy:
+#   mfp_capable and mfp_required are None when no RSN IE was captured.
+#   Both AUTH-002 and AUTH-003 are guarded by an is_not_none check on
+#   mfp_capable, so they only fire when the RSN IE was actually observed
+#   and the field values are concrete booleans.
+#   A network with no RSN IE (open or WEP) will not trigger an MFP finding
+#   — the MFP vulnerability is already implied by ENC-001 / ENC-002.
+# ---------------------------------------------------------------------------
+
+rules:
+
+  - id: AUTH-001
+    category: Authentication
+    severity: HIGH
+    title: "Wi-Fi Protected Setup (WPS) Advertised"
+    evidence_field: wps_present
+    condition:
+      op: is_true
+      field: wps_present
+    explanation: >-
+      A WPS vendor-specific Information Element (OUI 00:50:F2, type 04)
+      was observed in beacons from this AP, indicating that Wi-Fi Protected
+      Setup is advertised as available to connecting clients.
+    impact: >-
+      WPS PIN mode is vulnerable to the Pixie Dust attack (offline brute-force
+      of the enrollee nonce, often completing in under a minute) and to online
+      brute-force tools. An attacker may recover the WPS PIN and through it
+      the WPA2 passphrase without capturing any client traffic. Push-Button
+      Configuration (PBC) avoids the PIN attack surface but exposes a
+      two-minute open-enrollment window during which any nearby device
+      can associate.
+    remediation: >-
+      Disable WPS entirely in the AP administration interface. Modern devices
+      support direct passphrase entry and QR-code pairing without WPS.
+      If WPS cannot be disabled, verify that the firmware has patched
+      CVE-2011-5053 (Pixie Dust) and enforce rate-limiting on PIN attempts.
+
+  - id: AUTH-002
+    category: Management Frame Protection
+    severity: MEDIUM
+    title: "Management Frame Protection Not Advertised (IEEE 802.11w)"
+    evidence_field: mfp_capable
+    condition:
+      op: all_of
+      conditions:
+        - op: is_not_none   # RSN IE was observed — MFP field is meaningful
+          field: mfp_capable
+        - op: is_false      # MFPC bit = 0
+          field: mfp_capable
+        - op: is_false      # MFPR bit = 0
+          field: mfp_required
+    explanation: >-
+      An RSN Information Element was observed but the RSN Capabilities
+      field shows neither MFPC (Management Frame Protection Capable)
+      nor MFPR (Required). All 802.11 management frames — including
+      deauthentication and disassociation — are unauthenticated.
+    impact: >-
+      Deauthentication and disassociation frames can be forged trivially
+      using a spoofed BSSID. An attacker may disconnect clients (denial
+      of service), force reconnections to capture 4-way handshakes for
+      offline analysis, or create conditions that assist an evil-twin
+      attack — without breaking any encryption.
+    remediation: >-
+      Enable Management Frame Protection. For WPA2 networks, set MFP to
+      Optional (MFPC=1, MFPR=0) initially to maintain backward compatibility
+      with legacy clients, then set Required (MFPR=1) once all clients
+      support IEEE 802.11w. Upgrading to WPA3 mandates MFP for all clients.
+
+  - id: AUTH-003
+    category: Management Frame Protection
+    severity: LOW
+    title: "Management Frame Protection Optional, Not Required"
+    evidence_field: mfp_required
+    condition:
+      op: all_of
+      conditions:
+        - op: is_true    # MFPC bit = 1 (capable)
+          field: mfp_capable
+        - op: is_false   # MFPR bit = 0 (not required)
+          field: mfp_required
+    explanation: >-
+      The RSN Capabilities field shows MFPC=1 (capable) but MFPR=0 (not
+      required). The AP accepts associations both with and without Management
+      Frame Protection. Clients that do not negotiate MFP receive no
+      protection for management frames.
+    impact: >-
+      Non-MFP clients on this network remain vulnerable to spoofed
+      deauthentication and disassociation frames even while MFP-capable
+      clients are protected. An attacker can selectively target legacy
+      clients without affecting others.
+    remediation: >-
+      Set MFP to Required (MFPR=1) once all client devices support
+      IEEE 802.11w. Legacy devices that do not support MFP should be
+      retired or isolated to a separate VLAN or SSID. Upgrading to
+      WPA3-Personal makes MFP mandatory for all clients.
